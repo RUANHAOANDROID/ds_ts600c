@@ -50,29 +50,33 @@ class MainActivity : AppCompatActivity() {
             var tickStrart: Long = 0
             var tickend: Long = 0
             while (true) {
-                val info = searchcard()
+                val info = searchCard()
                 if (info != null) {
                     iret = info.type.toInt()
                     tickStrart = System.currentTimeMillis()
-                    if (iret == 2) {
-                        if (sfz_read() == 0) {
+                    when (iret) {
+                        1 -> {
+                            if (info.id.contains("040008")) {
+                                val sn = info.id.substring(6, info.id.length - 2)
+                                Log.d(TAG, "M1 card sn 16进制 :${sn}")
+                                Log.d(TAG, "M1 card sn 10进制 :${sn.toLong(16)}")
+                                Log.d(TAG, "M1 card sn 16进制反转 :${swapHexOrder(sn)}")
+                                Log.d(TAG, "M1 card sn 10进制反转 :${swapHexOrder(sn).toLong(16)}")
+                            }
+                        }
+
+                        2 -> {
+                            idCardRead()
                             tickend = System.currentTimeMillis()
                             Log.d(TAG, "耗时:" + (tickend - tickStrart))
                         }
-                    }
-                    if (iret == 187) {
-                        Log.d(TAG, "cardAuto: qrcode ${""}")
-                        val cardId = String(Base64.decode(info.id, Base64.DEFAULT))
-                        Log.d(TAG, "cardAuto: ${cardId}")
-                    }
-                    if (iret == 1) {
-                        if (info.id.contains("040008")) {
-                            val sn = info.id.substring(6, info.id.length - 2)
-                            Log.d(TAG, "M1 card sn 16进制 :${sn}")
-                            Log.d(TAG, "M1 card sn 10进制 :${sn.toLong(16)}")
-                            Log.d(TAG, "M1 card sn 16进制反转 :${swapHexOrder(sn)}")
-                            Log.d(TAG, "M1 card sn 10进制反转 :${swapHexOrder(sn).toLong(16)}")
+
+                        187 -> {
+                            Log.d(TAG, "cardAuto: qrcode ${""}")
+                            val cardId = String(Base64.decode(info.id, Base64.DEFAULT))
+                            Log.d(TAG, "cardAuto: ${cardId}")
                         }
+
                     }
                 }
             }
@@ -111,7 +115,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // 寻卡 返回卡类型
-    private fun searchcard(): CustomCardInfo? {
+    private fun searchCard(): CustomCardInfo? {
         val opTrans = TransOpParam()
         System.arraycopy("123456".toByteArray(), 0, opTrans.inputPinStr, 0, 6)
         System.arraycopy(byteArrayOf(0x00, 0x00, 0x00, 0x01), 0, opTrans.transNo, 0, 4)
@@ -138,57 +142,39 @@ class MainActivity : AppCompatActivity() {
         return cci
     }
 
-    private var isReading = false
-
     //读身份证
-    private fun sfz_read(): Int {
-        runOnUiThread {
-//                    logImg.setImageBitmap(bitmap);
-
-        }
-        isReading = true
+    private fun idCardRead() {
         var id2Parser: ID2Parser? = null
-        try {
+        runCatching {
             val opsfz = SfzTransOp()
             opsfz.cmdOp1 = 0x03
             opsfz.cmdOp2 = 0x00
             opsfz.lendataSend = 0
-            val iret = CApi.getSfzInfo(opsfz, comDevId)
-            if (iret == 0) {
+            val status = CApi.getSfzInfo(opsfz, comDevId)
+            if (status == 0) {
                 val tmpRecv = ByteArray(opsfz.lenRecv)
                 System.arraycopy(opsfz.recvBuf, 0, tmpRecv, 0, opsfz.lenRecv)
                 Log.d(TAG, "sfz_read sfz:" + StringUtil.bcd2Str(tmpRecv))
-                var r: IDCard? = null
-                try {
-                    r = IDCard(opsfz.recvBuf, 3)
-                    id2Parser = r
-                } catch (e: Exception) {
+                id2Parser = IDCard(opsfz.recvBuf, 3)
+                id2Parser?.let {
+                    Log.d(TAG, "sfz_read address = ${it.text.mAddress}")
+                    Log.d(TAG, "sfz_read cardNumber= ${it.text.mID2Num}")
+                    runOnUiThread {
+                        if (id2Parser == null) {
+                            Log.d(TAG, "sfz_read 读取失败，请重试...\n")
+                            imgHead.setImageBitmap(null)
+                            return@runOnUiThread
+                        }
+                        val idCard = it as IDCard
+                        val img = idCard.picBitmap
+                        imgHead.setImageBitmap(img)
+                    }
                 }
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        } finally {
-            val idData = id2Parser
-            isReading = false
-            runOnUiThread {
-//                    BaseIDReadActivity.this.onIDCardRead(idData);
-                if (idData == null) {
-                    Log.d(TAG, "sfz_read 读取失败，请重试...\n")
-                    imgHead.setImageBitmap(null)
-                } else {
-                    Log.d(TAG, "sfz_read address = ${idData.text.mAddress}")
-                    Log.d(TAG, "sfz_read cardNumber= ${idData.text.mID2Num}")
-                    //                        addLog("\n");
-                    val idCard = idData as IDCard
-                    val img = idCard.picBitmap
-                    imgHead.setImageBitmap(img)
-                }
-            }
-            return if (idData == null) 1 else 0
         }
     }
 
-    fun swapHexOrder(hexString: String): String {
+    private fun swapHexOrder(hexString: String): String {
         if (hexString.length != 8) {
             throw IllegalArgumentException("输入的十六进制字符串必须是8位")
         }
