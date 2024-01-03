@@ -16,5 +16,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "TS600C"
 include ':app'
-//include ':base_lib_module'
 include ':library'
