@@ -6,12 +6,16 @@ import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import com.hao.ts600c.desheng.IDCardInfo
 import com.reader.api.CApi
 import com.reader.api.ID2Parser
 import com.reader.api.IDCard
 import com.reader.api.SfzTransOp
 import com.reader.api.StringUtil
 import com.reader.api.TransOpParam
+import com.sensor.idcard.desheng.TS600C
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
@@ -28,7 +32,8 @@ class MainActivity : AppCompatActivity() {
             findCard()
         }
         findViewById<Button>(R.id.btnAudo).setOnClickListener {
-            cardAuto()
+//            cardAuto()
+            testTS600C()
         }
         val status = CApi.OpenDevice("/dev/ttyACM0", 115200)
         if (status > 0) {
@@ -46,9 +51,26 @@ class MainActivity : AppCompatActivity() {
 //            }
 //        }.start()
     }
-    var hb_sb_token: String? = null
-    var hb_sb_server_msg //联机返回的卡片认证信息
-            : String? = null
+
+    private fun testTS600C() {
+        val scope = CoroutineScope(Dispatchers.Default)
+        val tS600C = TS600C(this, scope)
+        tS600C.addQrCall {
+            Log.d(TAG, "testTS600C: qr =${it}")
+        }
+        val idCall: (Int, String?, IDCardInfo?) -> Unit = { status, message, idCardInfo ->
+            if (status == 0 && idCardInfo != null) {
+                if (idCardInfo is IDCardInfo.Chinese) {
+                    Log.d(TAG, "id card call:  ${idCardInfo.number}")
+                }
+            }
+        }
+        val icCall: (String) -> Unit = { icNo ->
+            Log.d(TAG, "testTS600C:  ${icNo}")
+        }
+        tS600C.start(idCall, icCall)
+    }
+
     private fun cardAuto() {
         Thread {
             var iret = 0
@@ -80,8 +102,8 @@ class MainActivity : AppCompatActivity() {
                             if (id.length > 16) {
                                 val sbInfo = CApi.getSbCardApproveData(comDevId)
                                 Log.d(TAG, "cardAuto 社保卡: ${sbInfo}")
-                                val params =JSONObject(sbInfo).getString("cardinfo").split("|")
-                                for (item in params){
+                                val params = JSONObject(sbInfo).getString("cardinfo").split("|")
+                                for (item in params) {
                                     Log.d(TAG, "item: ${item.hexToUnicode()}")
                                 }
                                 Log.d(TAG, "cardAuto 社保卡: ${sbInfo}")
@@ -102,14 +124,14 @@ class MainActivity : AppCompatActivity() {
 //                                        .innerAuthenticate(
 //                                            mac
 //                                        ).data()
-                                 hexToBytes(sbInfo)?.let {
-                                     try {
-                                         val res = String(it, Charset.forName("GBK"))
-                                         Log.d(TAG, "社保卡 gbk:${res}")
-                                     } catch (e: UnsupportedEncodingException) {
-                                         e.printStackTrace()
-                                     }
-                                 }
+                                hexToBytes(sbInfo)?.let {
+                                    try {
+                                        val res = String(it, Charset.forName("GBK"))
+                                        Log.d(TAG, "社保卡 gbk:${res}")
+                                    } catch (e: UnsupportedEncodingException) {
+                                        e.printStackTrace()
+                                    }
+                                }
                             }
                         }
 
@@ -238,6 +260,7 @@ class MainActivity : AppCompatActivity() {
         }
         return swappedHex.toString()
     }
+
     fun hexToBytes(hexStr: String): ByteArray? {
         var hexStr = hexStr ?: return null
         if (hexStr.length == 1) {

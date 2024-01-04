@@ -14,7 +14,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'maven-publish'
 }
-group='com.github.RUANHAOANDROID'
+group = 'com.github.RUANHAOANDROID'
 version = '1.0'
 
 android {
@@ -31,7 +31,7 @@ android {
     sourceSets {
         main {
             jniLibs.srcDirs = ['libs']
-            java.srcDirs=['src/main/java']
+            java.srcDirs = ['src/main/java']
         }
     }
     buildTypes {
@@ -50,11 +50,17 @@ android {
 }
 
 dependencies {
-
+    def lifecycle = "2.5.1"
 //    implementation 'androidx.core:core-ktx:1.8.0'
 //    implementation 'androidx.appcompat:appcompat:1.6.1'
 //    implementation 'com.google.android.material:material:1.11.0'
     implementation files('libs\\SDSES_WltNoLic_1.2.jar')
+    //livedata jetpack组件数据观察
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle"
+    //viewmodel MVVM组件
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle"
+    //lifecycle runtime
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle"
 //    testImplementation 'junit:junit:4.13.2'
 //    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
 //    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
