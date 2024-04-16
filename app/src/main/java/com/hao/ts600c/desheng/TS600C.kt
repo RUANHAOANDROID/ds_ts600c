@@ -1,8 +1,12 @@
 package com.sensor.idcard.desheng
 
+import android.R
+import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.util.Base64
 import android.util.Log
+import com.hao.ts600c.desheng.IDCardInfo
 import com.reader.api.CApi
 import com.reader.api.ID2Parser
 import com.reader.api.IDCard
@@ -10,13 +14,13 @@ import com.reader.api.SfzTransOp
 import com.reader.api.StringUtil
 import com.reader.api.TransOpParam
 import com.sensor.idcard.IDCardDevice
-import com.hao.ts600c.desheng.IDCardInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 import java.nio.charset.Charset
+
 
 class TS600C(
     private val context: Context,
@@ -75,14 +79,22 @@ class TS600C(
                 if (id.length > 16) {//社保卡
                     val sbInfo = CApi.getSbCardApproveData(comDevId)
                     Log.d(TAG, "cardAuto 社保卡: ${sbInfo}")
+                    val builder = AlertDialog.Builder(context)
+                    builder.setTitle("Title")
+                        .setMessage(sbInfo)
+                        .setIcon(R.drawable.ic_dialog_alert)
+                        .setPositiveButton("OK") { dialog, id ->
+                            // 处理确定按钮的点击事件
+                        }
+                        .setNegativeButton("Cancel") { dialog, id ->
+                            // 处理取消按钮的点击事件
+                        }
                     val params = JSONObject(sbInfo).getString("cardinfo").split("|")
                     for (item in params) {
                         Log.d(TAG, "item: ${item.hexToUnicode()}")
                     }
                     Log.d(TAG, "cardAuto 社保卡: ${sbInfo}")
-                    //社保卡先签到
                     Log.d(TAG, "cardAuto: unix${id.hexToUnicode()}")
-
                     Log.d(TAG, "cardAuto: unix${id.hexToUnicode()}")
                     hexToBytes(sbInfo)?.let {
                         try {
