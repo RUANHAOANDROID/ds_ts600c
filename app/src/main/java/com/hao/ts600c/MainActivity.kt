@@ -6,17 +6,12 @@ import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import com.hao.ts600c.desheng.IDCardInfo
 import com.reader.api.CApi
 import com.reader.api.ID2Parser
 import com.reader.api.IDCard
 import com.reader.api.SfzTransOp
 import com.reader.api.StringUtil
 import com.reader.api.TransOpParam
-import com.hao.ts600c.desheng.TS600C
-import com.hao.ts600c.desheng.TS600CV2
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
@@ -54,22 +49,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun testTS600C() {
-        val scope = CoroutineScope(Dispatchers.Default)
-        val tS600C = TS600CV2()
-        tS600C.addQrCall {
-            Log.d(TAG, "testTS600C: qr =${it}")
-        }
-        val idCall: (Int, String?, IDCardInfo?) -> Unit = { status, message, idCardInfo ->
-            if (status == 0 && idCardInfo != null) {
-                if (idCardInfo is IDCardInfo.Chinese) {
-                    Log.d(TAG, "id card call:  ${idCardInfo.number}")
-                }
-            }
-        }
-        val icCall: (String) -> Unit = { icNo ->
-            Log.d(TAG, "testTS600C:  ${icNo}")
-        }
-        tS600C.start(idCall, icCall)
+//        val scope = CoroutineScope(Dispatchers.Default)
+//        val tS600C = TS600C(this, cScope =scope )
+//        tS600C.addQrCall {
+//            Log.d(TAG, "testTS600C: qr =${it}")
+//        }
+//        val idCall: (Int, String?, IDCardInfo?) -> Unit = { status, message, idCardInfo ->
+//            if (status == 0 && idCardInfo != null) {
+//                if (idCardInfo is IDCardInfo.Chinese) {
+//                    Log.d(TAG, "id card call:  ${idCardInfo.number}")
+//                }
+//            }
+//        }
+//        val icCall: (String) -> Unit = { icNo ->
+//            Log.d(TAG, "testTS600C:  ${icNo}")
+//        }
+//        tS600C.start(idCall, icCall)
     }
 
     private fun cardAuto() {

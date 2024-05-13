@@ -50,14 +50,7 @@ android {
 }
 
 dependencies {
-    def lifecycle = "2.5.1"
     implementation files('libs\\SDSES_WltNoLic_1.2.jar')
-    //livedata jetpack组件数据观察
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle"
-    //viewmodel MVVM组件
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle"
-    //lifecycle runtime
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle"
 }
 afterEvaluate {
     publishing {

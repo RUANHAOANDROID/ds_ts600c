@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace 'com.hao.ts600c'
-    compileSdk 31
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.hao.ts600c"
         minSdk 25
-        targetSdk 31
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -40,16 +40,9 @@ android {
 }
 
 dependencies {
-    def retrofit_version = "2.9.0"
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.3.1'
     implementation 'com.google.android.material:material:1.5.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation project(path: ':library')
-    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
-    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
-    implementation "com.squareup.retrofit2:converter-scalars:$retrofit_version"
-    implementation "com.squareup.retrofit2:converter-protobuf:$retrofit_version"
-    implementation 'com.squareup.okhttp3:logging-interceptor:4.9.1'
-    implementation 'com.blankj:utilcodex:1.30.6'
 }
