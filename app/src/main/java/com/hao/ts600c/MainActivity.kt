@@ -13,7 +13,8 @@ import com.reader.api.IDCard
 import com.reader.api.SfzTransOp
 import com.reader.api.StringUtil
 import com.reader.api.TransOpParam
-import com.sensor.idcard.desheng.TS600C
+import com.hao.ts600c.desheng.TS600C
+import com.hao.ts600c.desheng.TS600CV2
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
@@ -54,7 +55,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun testTS600C() {
         val scope = CoroutineScope(Dispatchers.Default)
-        val tS600C = TS600C(this, scope)
+        val tS600C = TS600CV2()
         tS600C.addQrCall {
             Log.d(TAG, "testTS600C: qr =${it}")
         }

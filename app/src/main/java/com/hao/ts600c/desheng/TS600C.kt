@@ -1,4 +1,4 @@
-package com.sensor.idcard.desheng
+package com.hao.ts600c.desheng
 
 import android.content.Context
 import android.util.Base64
@@ -10,7 +10,7 @@ import com.reader.api.SfzTransOp
 import com.reader.api.StringUtil
 import com.reader.api.TransOpParam
 import com.sensor.idcard.IDCardDevice
-import com.hao.ts600c.desheng.IDCardInfo
+import com.sensor.idcard.desheng.CustomCardInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
