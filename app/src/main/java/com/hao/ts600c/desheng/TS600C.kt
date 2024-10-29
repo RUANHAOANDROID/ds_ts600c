@@ -187,4 +187,27 @@ class TS600C(
         }
         return swappedHex.toString()
     }
+    fun hexToBytes(hexStr: String): ByteArray? {
+        var hexStr = hexStr ?: return null
+        if (hexStr.length == 1) {
+            hexStr = "0$hexStr"
+        }
+        val length = hexStr.length / 2
+        val result = ByteArray(length)
+        for (i in 0 until length) {
+            result[i] = hexStr.substring(i * 2, i * 2 + 2).toInt(16).toByte()
+        }
+        return result
+    }
+
+    private fun String.hexToUnicode(): String {
+        val unicodeStringBuilder = java.lang.StringBuilder()
+        val hexChunks = this.chunked(4)
+        for (chunk in hexChunks) {
+            val swappedChunk = chunk.substring(2, 4) + chunk.substring(0, 2)
+            val unicodeValue = swappedChunk.toInt(16)
+            unicodeStringBuilder.append(unicodeValue.toChar())
+        }
+        return unicodeStringBuilder.toString()
+    }
 }
